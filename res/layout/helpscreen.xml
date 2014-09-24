@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollView1" 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:background="@drawable/bg3"
+        >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:isScrollContainer="true"
+            >
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GPS SETTINGS:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+          <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="1) Qwake uses both GPS and Network providers to access your current location.Activate your GPS through SETTINGS->Location Services->GPS Satellites."
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="2)Google Map Service is used , so check the Google App settings SETTINGS -> Location ->Let Google Apps access your location.It must be checked"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Alarm Settings:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1) Long Click on the map to add a location.Enter the name of the location , range and also an optional reminder text.Click OK"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+ <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="2)Switch on Internet  Settings-> WI-FI ON , SETTINGS-> Data Usage -> ON and type the address of the location in the search bar which provides Autocomplete results.Click on the result and enter the details "
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+<TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="3) In order to switch off the alarm tap the exit symbol in the bottom of the screen. The alarm will be cancelled."
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+ 
+ <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Message:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+ 
+ 
+ <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="1)You can choose to switch off the Message feature by going to App->Settings -> Send Message -> OFF.If Message feature is ON then type the name of the person you want to send Message."
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        </LinearLayout>
+    </ScrollView>
+

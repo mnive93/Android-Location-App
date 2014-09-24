@@ -1,0 +1,41 @@
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@drawable/bg3"
+tools:context=".MainActivity2" 
+
+>
+<RelativeLayout
+    android:paddingTop="40dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     >
+    
+    <fragment
+         android:id="@+id/map"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_alignBottom="@+id/autoCompleteTextView1"
+         class="com.google.android.gms.maps.SupportMapFragment"
+      
+          />
+</RelativeLayout>
+
+<LinearLayout
+    android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	 >
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ems="10" />
+  	
+
+</LinearLayout>
+     
+ 
+ </RelativeLayout>  

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false"> Qwake </string>
+     <string name="menu_settings"> MENU </string>
+     <string name="destination">END POINT</string>
+     <string name="str_atv_places">Enter Place Here</string>
+     <string name="locationname">Enter the location name</string>
+     <string name="range">Enter the range of distance </string>
+     <string name="reminder">Enter the reminder text </string>
+     <string name="km">km </string>
+     
+     
+     
+</resources>
