@@ -1,9 +1,20 @@
-package com.qwake.app;
+package com.tripmite.app;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 	
 import android.app.AlertDialog;
@@ -27,6 +38,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.inputmethod.*;
 import android.os.Message;
 import android.os.SystemClock;
@@ -47,9 +59,11 @@ import android.widget.Toast;
 import android.provider.*;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import android.location.LocationListener;
 
+import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -71,16 +85,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
-import com.qwake.app.R;
+import com.tripmite.app.R;
 
-public class MainActivity2 extends FragmentActivity implements LocationListener,OnMapLongClickListener  {
+public class MainActivity2 extends FragmentActivity implements LocationListener,OnMapLongClickListener,GooglePlayServicesClient.ConnectionCallbacks,
+GooglePlayServicesClient.OnConnectionFailedListener {
   private GoogleMap map;
   Location location;
 LatLng fromPosition;
 LatLng toPosition;
-Drawable drawable;
-Document document;
-GetRoute v2GetRouteDirection;
 MarkerOptions markerOptions;
 MarkerOptions markerfrom;
 AlertDialog.Builder alert;
@@ -91,6 +103,9 @@ DatabaseHandler db;
 LocationManager locationManager;
 double maxDistance;
 boolean gpsIsEnabled,networkIsEnabled;
+LocationClient mLocationClient;
+LatLng currentpos;
+
 @Override
 
   protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +113,9 @@ boolean gpsIsEnabled,networkIsEnabled;
     db = new DatabaseHandler(this);
     setContentView(R.layout.activity_main2);
 	 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+	 mLocationClient = new LocationClient(this, this, this);
      myPreference=PreferenceManager.getDefaultSharedPreferences(this);
-	 	  gpsIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    	 	  gpsIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     	  if(!gpsIsEnabled)
           {
        	   AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -117,164 +133,37 @@ boolean gpsIsEnabled,networkIsEnabled;
        	   alertDialog.show();
        	   return;
           }
-    	  else
-    	  {
-    		  setupmap();
-    		  
-    	  }
+    	  alert = new AlertDialog.Builder(this);
+  	    final View inflatedView = this.getLayoutInflater().inflate(R.layout.activity2, null);
+  	    alert.setView(inflatedView);
+  	    alert.setTitle("Enter the details");
+  	    SeekBar seek = (SeekBar) inflatedView.findViewById(R.id.distanceseek);
+  	    seek.setMax(100);
+  	    seek.setProgress(5); // Set it to zero so it will start at the left-most edge
+  	    seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-    
-       // Setting latitude and longitude in the TextView tv_location
-  }
-public void setupmap()
-{
+  	        @Override
+  	        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+  	            progress = progress + 5; // Add the minimum value (1)
+  	            double floatval = (double) progress / 10;
+  	            TextView text = (TextView) inflatedView.findViewById(R.id.distval);
+  	            text.setText(Double.toString(floatval) + MainActivity2.this.getResources().getString(R.string.km));
+  	            maxDistance = floatval *1000;
+  	        }
 
-	int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
-	 
-	   
-    // Showing status
-    if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+  			@Override
+  			public void onStartTrackingTouch(SeekBar arg0) {
+  				// TODO Auto-generated method stub
+  				
+  			}
 
-        int requestCode = 10;
-        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
-        dialog.show();
-
-    }else { // Google Play Services are available
-
-       	  // boolean networkIsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-     	  	
- 
-        // Getting reference to the SupportMapFragment of activity_main.xml
-        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-        // Getting GoogleMap object from the fragment
-        
-        map = fm.getMap();
-               // Enabling MyLocation Layer of Google Map
-     
-       markerOptions = new MarkerOptions();
-       markerfrom = new MarkerOptions();
-       map.setOnMapLongClickListener(this);
-       v2GetRouteDirection = new GetRoute();
-   	
-       Criteria criteria = new Criteria();
-	      String provider = locationManager.getBestProvider(criteria, true);
-	       location = locationManager.getLastKnownLocation(provider);
-	         fromPosition = new LatLng(location.getLatitude(),location.getLongitude());
-           	 
-      
-       
-        // Zoom in the Google Map
-       map.setMyLocationEnabled(true);
-       if(myPreference.getBoolean("traffic", true))
-       {
-       map.setTrafficEnabled(true);
-       }
-       else
-       {
-    	   
-       }
-      
-       }
-       if(gpsIsEnabled)
-       {
-           locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-       }
-       else if(networkIsEnabled)
-       {
-           locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,0, this);
-       }
-       map.moveCamera(CameraUpdateFactory.newLatLng(fromPosition));
-       map.animateCamera(CameraUpdateFactory.zoomTo(14));
-
-	 
-
-	AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView1);
-    autoCompView.setAdapter(new ActivityAdapter(this, R.layout.items_list));
-    autoCompView.setOnItemClickListener(new OnItemClickListener() {
-    	 public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-       
-    	String str = (String) adapterView.getItemAtPosition(position);
-        Geocoder coder = new Geocoder(getApplicationContext());
-        List<Address> address;
-    try
-    {
-    	 address = coder.getFromLocationName(str,5);
-    	
-    	    
-    	    if (address!=null) 
-            {            
-          	  Address location = address.get(0);
-          	  LatLng currentpos = new LatLng(location.getLatitude(),location.getLongitude());
-          	  Toast.makeText(MainActivity2.this,
-                        "Location Are" + location.getLatitude() + ":" + location.getLongitude(), Toast.LENGTH_SHORT)
-                        .show();  	  
-          	  map.addMarker(new MarkerOptions().position(currentpos).title("SaveMe").snippet("Place of Interest").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-              map.animateCamera(CameraUpdateFactory.zoomTo(14));
-          	  map.moveCamera(CameraUpdateFactory.newLatLng(currentpos));
-
-                // Zoom in the Google Map
-
-            toPosition = new LatLng(location.getLatitude(),location.getLongitude());
-            markerOptions.position(toPosition);
-            markerfrom.position(fromPosition);
-            markerOptions.title("destination");
-            markerOptions.snippet("You will reach there safely");
-            markerOptions.draggable(true);
-            map.addMarker(markerOptions);
-            map.addMarker(markerfrom);
-            alert.show();
-           
-         
-            
-            }
-    }
-    catch(Exception e)
-    {
-    	
-    	Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-    }
-        
-
-    }
-    });
-
-
-     alert = new AlertDialog.Builder(this);
-    final View inflatedView = this.getLayoutInflater().inflate(R.layout.activity2, null);
-    alert.setView(inflatedView);
-    alert.setTitle("Enter the details");
-    SeekBar seek = (SeekBar) inflatedView.findViewById(R.id.distanceseek);
-    seek.setMax(100);
-    seek.setProgress(5); // Set it to zero so it will start at the left-most edge
-    seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            progress = progress + 5; // Add the minimum value (1)
-            double floatval = (double) progress / 10;
-            TextView text = (TextView) inflatedView.findViewById(R.id.distval);
-            text.setText(Double.toString(floatval) + MainActivity2.this.getResources().getString(R.string.km));
-            maxDistance = floatval *1000;
-        }
-
-		@Override
-		public void onStartTrackingTouch(SeekBar arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onStopTrackingTouch(SeekBar arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    });
-
-	
-	
-//LOADING CONTACTS 	
-	     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+  			@Override
+  			public void onStopTrackingTouch(SeekBar arg0) {
+  				// TODO Auto-generated method stub
+  				
+  			}
+  	    });
+ alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		  
 		  public void onClick(DialogInterface dialog, int whichButton) {
     	try
@@ -293,7 +182,7 @@ public void setupmap()
         String lon = String.valueOf(toPosition.longitude);
         if(nameloc.equals(null))
         {
-        	Toast.makeText(getApplicationContext(), "ENter name and the range", Toast.LENGTH_SHORT).show();}
+        	Toast.makeText(getApplicationContext(), "Enter name and the range", Toast.LENGTH_SHORT).show();}
         else
         {
 
@@ -323,7 +212,121 @@ public void setupmap()
 	}
     }    
             });
+  	    AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView1);
+    	  autoCompView.setHint("Search");
+    	    autoCompView.setAdapter(new ActivityAdapter(this, R.layout.items_list));
+    	    autoCompView.setOnItemClickListener(new OnItemClickListener() {
+    	    	 public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+    	       
+    	    	String str = (String) adapterView.getItemAtPosition(position);
+    	  toPosition = getLocationString(str);
+    	    try
+    	    {
+    	    	
+    	          	  map.addMarker(new MarkerOptions().position(toPosition).title("SaveMe").snippet(str).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+    	              map.animateCamera(CameraUpdateFactory.zoomTo(14));
+    	          	  map.moveCamera(CameraUpdateFactory.newLatLng(toPosition));
+
+    	                // Zoom in the Google Map
+
+    	        
+    	            markerOptions.position(toPosition);
+    	            
+    	            markerOptions.title("destination");
+    	            markerOptions.snippet("You will reach there safely");
+    	            markerOptions.draggable(true);
+    	            map.addMarker(markerOptions);
+    	           
+    	            alert.show();
+    	           
+    	     
+    	            
+    	    }
+    	    catch(Exception e)
+    	    {
+    	    	
+    	    	e.printStackTrace();
+    	    }
+    	        
+    	    	 }
+    	    
+    	    });
+
+
+    	  
     
+       // Setting latitude and longitude in the TextView tv_location
+  }
+
+public void setupmap()
+{
+
+	int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
+	 
+	   
+    // Showing status
+    if(status!=ConnectionResult.SUCCESS){ // Google Play Services are not available
+
+        int requestCode = 10;
+        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
+        dialog.show();
+
+    }else { // Google Play Services are available
+
+       	  // boolean networkIsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+     	  	
+ 
+        // Getting reference to the SupportMapFragment of activity_main.xml
+        SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        // Getting GoogleMap object from the fragment
+        
+        map = fm.getMap();
+        mLocationClient.connect();
+               // Enabling MyLocation Layer of Google Map
+     if(map!=null)
+     {
+       markerOptions = new MarkerOptions();
+       markerfrom = new MarkerOptions();
+       map.setOnMapLongClickListener(this);
+       map.setMyLocationEnabled(true);
+   	
+       Criteria criteria = new Criteria();
+	      String provider = locationManager.getBestProvider(criteria, true);
+	       location = mLocationClient.getLastLocation();
+	       if(location!=null)
+	       {
+	       fromPosition = new LatLng(location.getLatitude(),location.getLongitude());
+	       map.moveCamera(CameraUpdateFactory.newLatLng(fromPosition));
+	       map.animateCamera(CameraUpdateFactory.zoomTo(14));
+
+	       } 
+      
+       
+        // Zoom in the Google Map
+     
+       if(myPreference.getBoolean("traffic", true))
+       {
+       map.setTrafficEnabled(true);
+       }
+      
+      
+       }
+       if(gpsIsEnabled)
+       {
+           locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+       }
+       else if(networkIsEnabled)
+       {
+           locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,0, this);
+       }
+      
+	Toast.makeText(getApplicationContext(), "hre",Toast.LENGTH_SHORT).show();
+
+	
+//LOADING CONTACTS 	
+	    
+    }
     }
 	
 
@@ -346,8 +349,50 @@ public void setupmap()
       map.animateCamera(CameraUpdateFactory.zoomTo(14));
 
   }
-  
+  public LatLng getLocationString (String address)
+  {
+			double lng=0;
+			double lat = 0;
+			try
+			{
+	    HttpGet httpGet = new HttpGet(
+	            "http://maps.google.com/maps/api/geocode/json?address="
+	                    + URLEncoder.encode(address, "UTF-8") + "&ka&sensor=false");
+	    HttpClient client = new DefaultHttpClient();
+	    HttpResponse response;
+	    StringBuilder stringBuilder = new StringBuilder();
 
+	    try {
+	        response = client.execute(httpGet);
+	        HttpEntity entity = response.getEntity();
+	        InputStream stream = entity.getContent();
+	        int b;
+	        while ((b = stream.read()) != -1) {
+	            stringBuilder.append((char) b);
+	        }
+	    } catch (ClientProtocolException e) {
+	    } catch (IOException e) {
+	    }
+
+	    JSONObject jsonObject = new JSONObject();
+	    jsonObject = new JSONObject(stringBuilder.toString());
+	   
+	    lng = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+	            .getJSONObject("geometry").getJSONObject("location")
+	            .getDouble("lng");
+
+	    lat = ((JSONArray) jsonObject.get("results")).getJSONObject(0)
+	            .getJSONObject("geometry").getJSONObject("location")
+	            .getDouble("lat");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+	    return new LatLng(lat, lng);
+	    
+		}
+		
 @Override
 public void onLocationChanged(Location location) {
 //	 drawMarker(location);
@@ -389,11 +434,40 @@ public void onMapLongClick(LatLng current) {
        alert.show();
       
 }
-
+@Override
+protected void onStart() {
+    super.onStart();
+    try
+    {
+   mLocationClient.connect();
+   setupmap();
+    }
+    catch(Exception e)
+    {
+    	e.printStackTrace();
+    }
+}
 @Override
 protected void onStop() {
+  
+    mLocationClient.disconnect();
     super.onStop();
     finish();
+}
+@Override
+public void onConnectionFailed(ConnectionResult result) {
+	// TODO Auto-generated method stub
+	
+}
+@Override
+public void onConnected(Bundle connectionHint) {
+	// TODO Auto-generated method stub
+	Toast.makeText(getApplicationContext(), "Connected",Toast.LENGTH_SHORT).show();
+}
+@Override
+public void onDisconnected() {
+	// TODO Auto-generated method stub
+	
 }
 
 }

@@ -1,4 +1,4 @@
-package com.qwake.app;
+package com.tripmite.app;
 
 import android.app.Activity;
 import android.os.Bundle;

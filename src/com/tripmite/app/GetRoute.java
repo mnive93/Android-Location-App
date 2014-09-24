@@ -1,4 +1,4 @@
-package com.qwake.app;
+package com.tripmite.app;
 import java.io.InputStream;
 import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;

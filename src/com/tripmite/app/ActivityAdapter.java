@@ -1,4 +1,4 @@
-package com.qwake.app;
+package com.tripmite.app;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,7 +29,7 @@ public class ActivityAdapter extends ArrayAdapter<String> implements Filterable 
 
 		private ArrayList<String> autocomplete(String input) {
 		    ArrayList<String> resultList = null;
-		    
+		    Log.d("here",input);
 		    HttpURLConnection conn = null;
 		    StringBuilder jsonResults = new StringBuilder();
 		    try {

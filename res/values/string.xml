@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false"> Qwake </string>
+    <string name="app_name" translatable="false"> Tripmite </string>
      <string name="menu_settings"> MENU </string>
      <string name="destination">END POINT</string>
      <string name="str_atv_places">Enter Place Here</string>

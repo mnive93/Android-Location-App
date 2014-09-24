@@ -1,4 +1,4 @@
-package com.qwake.app;
+package com.tripmite.app;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +41,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.qwake.app.R;
+import com.tripmite.app.R;
 
 public class StartAlarm extends FragmentActivity implements LocationListener{
 	private GoogleMap map;
