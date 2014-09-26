@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/lenovo/Documents/adt-bundle-windows-x86/adt-bundle-windows-x86/sdk/extras/android/support/v7/appcompat/libs/android-support-v7-appcompat.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/lenovo/Documents/adt-bundle-windows-x86/adt-bundle-windows-x86/sdk/extras/android/support/v7/appcompat/libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/lenovo/Documents/adt-bundle-windows-x86/adt-bundle-windows-x86/sdk/add-ons/google_apis-17/libs/maps.jar"/>
+	<classpathentry kind="lib" path="C:/Users/lenovo/workspace/google-play-services_lib/libs/google-play-services.jar"/>
+	<classpathentry kind="lib" path="C:/Users/lenovo/workspace/google-play-services_lib/bin/google-play-services_lib.jar"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
